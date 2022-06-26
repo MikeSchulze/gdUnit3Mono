@@ -34,7 +34,6 @@ jobs:
           repository: MikeSchulze/gdUnit3
 
       - name: List content
-        uses: bash
         run: |
           ls -lsa
 
