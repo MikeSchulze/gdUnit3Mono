@@ -36,6 +36,7 @@ jobs:
       - name: List content
         run: |
           ls -lsa
+          rm -rf mono/src/
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v1
