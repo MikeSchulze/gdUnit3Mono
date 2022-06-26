@@ -33,6 +33,12 @@ jobs:
         with:
           repository: MikeSchulze/gdUnit3
 
+      - name: List content
+        uses: bash
+        run: |
+          ls -lsa
+
+
       - name: Setup .NET
         uses: actions/setup-dotnet@v1
         with:
