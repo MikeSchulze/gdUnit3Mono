@@ -22,22 +22,20 @@ jobs:
       image: barichello/godot-ci:${{ matrix.godot }}
 
     steps:
+      - name: Checkout GdUnit3
+        uses: actions/checkout@v3
+        with:
+          repository: MikeSchulze/gdUnit3
+
       - name: Checkout
         uses: actions/checkout@v3
         with:
           lfs: true
           path: mono
-      
-      - name: Checkout GdUnit3
-        uses: actions/checkout@v3
-        with:
-          repository: MikeSchulze/gdUnit3
-          path: main
 
       - name: List content
         run: |
           ls -lsa
-
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v1
