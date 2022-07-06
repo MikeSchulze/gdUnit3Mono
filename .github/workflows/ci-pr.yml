@@ -41,6 +41,7 @@ jobs:
           rm -rf gdUnit3.cs*
           cp ./mono/gdUnit3Mono.csproj gdUnit3.csproj
           mv ./mono/TestRunner.* .
+          mv ./mono/test /test
           chmod 777 ./mono/runtests.sh
 
       - name: Setup .NET
