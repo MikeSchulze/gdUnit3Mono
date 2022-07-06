@@ -45,7 +45,7 @@ jobs:
 
       - name: Compile
         run: |
-          dotnet restore gdUnit3Mono.csproj
+          dotnet restore ./mono/gdUnit3Mono.csproj
           mkdir -p .mono/assemblies/Debug
           cp /usr/local/bin/GodotSharp/Api/Release/* .mono/assemblies/Debug
           dotnet build -verbosity:m
@@ -55,7 +55,7 @@ jobs:
         env:
           GODOT_BIN: "/usr/local/bin/godot"
         shell: bash
-        run: ./runtest.sh -a res://mono/test
+        run: ./mono/runtest.sh -a res://mono/test
 
       - name: Publish Test Reports
         if: always()
