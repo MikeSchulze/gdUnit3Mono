@@ -6,7 +6,7 @@ using GdUnit3.Core;
 
 namespace GdUnit3.Executions
 {
-    internal sealed class TestSuite : IDisposable
+    sealed class TestSuite : IDisposable
     {
         private Lazy<IEnumerable<Executions.TestCase>> _testCases = new Lazy<IEnumerable<Executions.TestCase>>();
 
