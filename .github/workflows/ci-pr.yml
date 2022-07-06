@@ -22,21 +22,22 @@ jobs:
       image: barichello/godot-ci:${{ matrix.godot }}
 
     steps:
-      - name: Checkout GdUnit3
+      - name: Checkout GdUnit3 Plugin
         uses: actions/checkout@v3
         with:
           repository: MikeSchulze/gdUnit3
 
-      - name: Checkout
+      - name: Checkout GdUnit3Mono
         uses: actions/checkout@v3
         with:
           lfs: true
           path: mono
 
-      - name: List content
+      - name: Patch Project files
         run: |
           ls -lsa
-          rm -rf mono/src/
+          rm -rf gdUnit3.cs*
+          cp ./mono/gdUnit3Mono.csproj gdUnit3.csproj
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v1
@@ -45,7 +46,7 @@ jobs:
 
       - name: Compile
         run: |
-          dotnet restore ./mono/gdUnit3Mono.csproj
+          dotnet restore gdUnit3.csproj
           mkdir -p .mono/assemblies/Debug
           cp /usr/local/bin/GodotSharp/Api/Release/* .mono/assemblies/Debug
           dotnet build -verbosity:m
