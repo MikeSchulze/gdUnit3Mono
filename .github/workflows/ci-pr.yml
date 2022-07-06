@@ -40,10 +40,8 @@ jobs:
         run: |
           rm -rf gdUnit3.cs*
           cp ./mono/gdUnit3Mono.csproj gdUnit3.csproj
-          ls -lsa
-          ls mono -lsa
+          cp ./mono/TestRunner.* .
           chmod 777 ./mono/runtests.sh
-          ls mono -lsa
 
       - name: Setup .NET
         if: ${{ !cancelled() }}

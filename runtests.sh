@@ -6,6 +6,6 @@ if [ -z "$GODOT_BIN" ]; then
     exit 1
 fi
 
-$GODOT_BIN --no-window -d res://mono/src/core/TestRunner.tscn --verbose $*
+$GODOT_BIN --no-window -d res://TestRunner.tscn --verbose $*
 exit_code=$?
 exit $exit_code
