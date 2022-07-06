@@ -56,7 +56,7 @@ jobs:
         env:
           GODOT_BIN: "/usr/local/bin/godot"
         shell: bash
-        run: ./mono/runtest.sh -a res://mono/test
+        run: ./mono/runtests.sh -a res://mono/test
 
       - name: Publish Test Reports
         if: always()
