@@ -74,7 +74,7 @@ jobs:
         uses: ./.github/actions/unit-test
         with:
           godot-bin: ${{ env.GODOT_BIN }}
-          test-includes: "res://mono/test"
+          test-includes: "res://test"
 
       - name: "Publish Unit Test Reports"
         if: ${{ !cancelled() }}
