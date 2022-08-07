@@ -149,7 +149,7 @@ namespace GdUnit3.Core.Tests
 using Godot;
 using GdUnit3;
 
-namespace Example.Test.Resources
+namespace GdUnit3.Example.Test.Resources
 {
 	using static Assertions;
 	using static Utils;
@@ -178,7 +178,7 @@ namespace Example.Test.Resources
 using Godot;
 using GdUnit3;
 
-namespace Example.Test.Resources
+namespace GdUnit3.Example.Test.Resources
 {
 	using static Assertions;
 	using static Utils;
