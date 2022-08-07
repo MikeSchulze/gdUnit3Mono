@@ -45,14 +45,21 @@ jobs:
           lfs: true
           path: mono
 
-      - name: "Patch Project files"
+      - name: "Patch Project"
         if: ${{ !cancelled() }}
         run: |
-          rm -rf gdUnit3.cs*
+          rm -rf gdUnit3.csproj
+          rm -rf gdUnit3.sln
           cp ./mono/gdUnit3Mono.csproj gdUnit3.csproj
-          mv ./mono/TestRunner.* .
-          mv ./mono/test ./test
-          chmod 777 ./mono/runtests.sh
+          rm -rf addons/gdUnit3/test/
+          mv mono/test ./test
+
+      - name: "Update Project"
+        if: ${{ !cancelled() }}
+        timeout-minutes: 1
+        continue-on-error: true # we still ignore the timeout, the script is not quit and we run into a timeout
+        run: |
+          ${{ env.GODOT_BIN }} -e --path . -s res://addons/gdUnit3/src/core/scan_project.gd --no-window
 
       - name: "Setup .NET"
         if: ${{ !cancelled() }}
