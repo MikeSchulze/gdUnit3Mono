@@ -21,6 +21,7 @@
     <!-- Content Include=".gitignore" -->
     <Content Include="LICENSE" />
     <None Include="LICENSE" Pack="true" PackagePath="" />
+    <!-- Exclude on release
     <None Remove="test\**" />
     <Content Remove="test\**" />
     <Compile Remove="test\**" />
@@ -30,5 +31,6 @@
     <Content Remove="addons\**" />
     <Compile Remove="addons\**" />
     <EmbeddedResource Remove="addons\**" />
+    -->
   </ItemGroup>
 </Project>
