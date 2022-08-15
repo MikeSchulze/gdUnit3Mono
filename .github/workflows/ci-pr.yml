@@ -51,6 +51,7 @@ jobs:
           rm -rf gdUnit3.csproj
           rm -rf gdUnit3.sln
           cp ./mono/gdUnit3Mono.csproj gdUnit3.csproj
+          cp ./mono/gdUnit3Mono.sln gdUnit3.sln
           rm -rf addons/gdUnit3/test/
           mv mono/test ./test
 
