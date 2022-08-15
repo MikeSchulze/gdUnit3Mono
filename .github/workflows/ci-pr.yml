@@ -1,4 +1,4 @@
-name: CI GdUnit3 on Godot Mono 3.3.x
+name: CI-PR
 
 on:
   pull_request:
@@ -49,12 +49,11 @@ jobs:
         if: ${{ !cancelled() }}
         run: |
           rm -rf gdUnit3.csproj
-          rm -rf gdUnit3.sln
-          cp ./mono/gdUnit3Mono.csproj gdUnit3.csproj
-          cp ./mono/gdUnit3Mono.sln gdUnit3.sln
           rm -rf addons/gdUnit3/test/
+          cp ./mono/gdUnit3Mono.csproj gdUnit3.csproj
           mv mono/test ./test
 
+        # cp ./mono/gdUnit3Mono.sln gdUnit3.sln
         # sed -i 's+config/name="gdUnit3"+config/name="gdUnit3Mono"+g' project.godot
 
       - name: "Setup .NET"
