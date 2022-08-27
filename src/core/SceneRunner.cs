@@ -91,7 +91,7 @@ namespace GdUnit3
                         current = result[0];
                     }
                     if (comperator(current))
-                        return (IAssertBase<V>)AssertThat<V>((V)current);
+                        return (IAssertBase<V>)AssertThat(current);
                 }
             }
         }
