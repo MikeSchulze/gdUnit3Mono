@@ -9,7 +9,7 @@ namespace GdUnit3.Asserts
 
         public INumberAssert<V> IsBetween(V from, V to)
         {
-            if (from.CompareTo(Current) > 0 || Current?.CompareTo(to) > 0)
+            if (Current?.CompareTo(from) < 0 || Current?.CompareTo(to) > 0)
                 ThrowTestFailureReport(AssertFailures.IsBetween(Current, from, to), Current, new V[] { from, to });
             return this;
         }
