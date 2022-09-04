@@ -78,9 +78,9 @@ namespace GdUnit3
         /// <summary>
         /// An Assertion to verify Godot signals
         /// </summary>
-        /// <param name="node">The node where is emmiting the signal</param>
+        /// <param name="node">The object where is emitting the signal</param>
         /// <returns></returns>
-        public static ISignalAssert AssertSignal(Godot.Node node) => new SignalAssert(node);
+        public static ISignalAssert AssertSignal(Godot.Object node) => new SignalAssert(node);
 
         public static IStringAssert AssertThat(string current) => new StringAssert(current);
         public static IBoolAssert AssertThat(bool current) => new BoolAssert(current);

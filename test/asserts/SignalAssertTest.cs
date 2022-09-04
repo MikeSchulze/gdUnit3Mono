@@ -1,8 +1,5 @@
 // GdUnit generated TestSuite
-using Godot;
-using GdUnit3;
 using System.Threading.Tasks;
-using System;
 
 namespace GdUnit3.Asserts
 {
@@ -19,11 +16,11 @@ namespace GdUnit3.Asserts
 
         class TestEmitter : Godot.Node2D
         {
-            [Signal]
+            [Godot.Signal]
             delegate void SignalA();
-            [Signal]
+            [Godot.Signal]
             delegate void SignalB(string value);
-            [Signal]
+            [Godot.Signal]
             delegate void SignalC(string value, int count);
 
             private int frame = 0;
@@ -69,7 +66,7 @@ namespace GdUnit3.Asserts
             await AssertSignal(node).IsNotEmitted("script_changed").WithTimeout(100);
 
             node.Visible = false;
-            await AssertThrown( AssertSignal(node).IsNotEmitted("visibility_changed").WithTimeout(200))
+            await AssertThrown(AssertSignal(node).IsNotEmitted("visibility_changed").WithTimeout(200))
                 .ContinueWith(result => result.Result?
                     .IsInstanceOf<GdUnit3.Exceptions.TestFailedException>()
                     .HasMessage("Expecting do NOT emitting signal:\n  'visibility_changed()'\n by\n  <Godot.Node2D>"));
@@ -78,7 +75,7 @@ namespace GdUnit3.Asserts
         [TestCase]
         public async Task NodeChanged_EmittingSignals()
         {
-            var node = AddNode(new Node2D());
+            var node = AddNode(new Godot.Node2D());
             await AssertSignal(node).IsEmitted("visibility_changed").WithTimeout(200);
 
             node.Visible = false;
@@ -98,7 +95,7 @@ namespace GdUnit3.Asserts
         [TestCase]
         public void IsSignalExists()
         {
-            var node = AutoFree(new Node2D());
+            var node = AutoFree(new Godot.Node2D());
 
             AssertSignal(node).IsSignalExists("visibility_changed")
                 .IsSignalExists("draw")

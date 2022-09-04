@@ -1,10 +1,8 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using System.Text;
-using Godot;
 
 namespace GdUnit3.Asserts
 {
@@ -437,12 +435,12 @@ namespace GdUnit3.Asserts
                         FormatCurrent(current));
         }
 
-        internal static string IsEmitted(Godot.Object? current, string signal, object[] args) =>
+        internal static string IsEmitted(object? current, string signal, object[] args) =>
             string.Format("{0}\n  {1}\n by\n  {2}",
                          FormatFailure("Expecting do emitting signal:"),
                          FormatExpected($"{signal}({args.Formated()})"),
                          FormatCurrent(current, true));
-        internal static string IsNotEmitted(Godot.Object? current, string signal, object[] args) =>
+        internal static string IsNotEmitted(object? current, string signal, object[] args) =>
             string.Format("{0}\n  {1}\n by\n  {2}",
                          FormatFailure("Expecting do NOT emitting signal:"),
                          FormatExpected($"{signal}({args.Formated()})"),
