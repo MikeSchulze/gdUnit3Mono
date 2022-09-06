@@ -196,5 +196,13 @@ namespace GdUnit3.Example.Test.Resources
 	}
 }".Replace("${sourceClazzPath}", $"\"{sourceClass}\"").Replace("\r\n", "\n");
 
+
+        [TestCase]
+        public void ParseTestSuite()
+        {
+            var testSuite = GdUnitTestSuiteBuilder.ParseTestSuite("test/core/resources/testsuites/mono/spaceA/TestSuite.cs");
+            AssertThat(testSuite).IsNotNull();
+        }
+
     }
 }

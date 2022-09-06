@@ -51,7 +51,7 @@ namespace GdUnit3.Executions
             return type.GetMethods()
                 .Where(m => m.IsDefined(typeof(TestCaseAttribute)))
                 .Where(m => includedTests == null || includedTests.Contains(m.Name))
-                .Select(mi => new Executions.TestCase(mi));
+                .Select(mi => new Executions.TestCase(mi, 10));
         }
 
         public void Dispose()

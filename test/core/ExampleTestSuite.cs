@@ -49,12 +49,20 @@ namespace GdUnit3.Tests.Asserts
         [TestCase]
         public async Task waiting()
         {
-            await DoWait(5000);
+            await DoWait(1000);
         }
 
 
         [TestCase]
         public void TestFooBar()
+        {
+            AssertBool(true).IsEqual(true);
+        }
+
+        [TestCase(1, 2, 3, Name="A")]
+        [TestCase(3, 4, 5, Name="B")]
+        [TestCase(6, 7, 8, Name="C")]
+        public void TestDataPoints()
         {
             AssertBool(true).IsEqual(true);
         }

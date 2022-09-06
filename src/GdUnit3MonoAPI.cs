@@ -57,6 +57,6 @@ namespace GdUnit3
 
         private static IEnumerable<GdUnit3.Executions.TestCase> LoadTestCases(Type type) => type.GetMethods()
             .Where(m => m.IsDefined(typeof(TestCaseAttribute)))
-            .Select(mi => new GdUnit3.Executions.TestCase(mi));
+            .Select(mi => new GdUnit3.Executions.TestCase(mi, 10));
     }
 }

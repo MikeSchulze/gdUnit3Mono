@@ -7,15 +7,17 @@ namespace GdUnit3.Executions
 {
     internal sealed class TestCase
     {
-        public TestCase(MethodInfo methodInfo)
+        public TestCase(MethodInfo methodInfo, int lineNumber)
         {
             MethodInfo = methodInfo;
+            Line = lineNumber;
             Parameters = InitialParameters();
         }
 
         public string Name => MethodInfo.Name;
 
-        public int Line => Attributes.Line;
+        public int Line
+        { get; private set; }
 
         public TestCaseAttribute Attributes => MethodInfo.GetCustomAttribute<TestCaseAttribute>();
 

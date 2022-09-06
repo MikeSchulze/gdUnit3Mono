@@ -2,7 +2,7 @@ using System;
 
 namespace GdUnit3
 {
-    [AttributeUsage(AttributeTargets.Method, AllowMultiple = false, Inherited = false)]
+    [AttributeUsage(AttributeTargets.Method, AllowMultiple = true, Inherited = false)]
     public class TestCaseAttribute : TestStageAttribute
     {
         /// <summary>
@@ -15,16 +15,15 @@ namespace GdUnit3
         /// </summary>
         public int Iterations { get; set; } = 1;
 
-        public TestCaseAttribute([System.Runtime.CompilerServices.CallerLineNumber] int line = 0, [System.Runtime.CompilerServices.CallerMemberName] string name = "")
+        public TestCaseAttribute(params object[]? args)
         {
-            Name = name;
-            Line = line;
         }
     }
 
     [AttributeUsage(AttributeTargets.Method, AllowMultiple = false, Inherited = false)]
     public class BeforeTestAttribute : TestStageAttribute
     {
+
         public BeforeTestAttribute([System.Runtime.CompilerServices.CallerLineNumber] int line = 0, [System.Runtime.CompilerServices.CallerMemberName] string name = "")
         {
             Line = line;

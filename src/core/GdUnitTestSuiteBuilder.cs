@@ -1,7 +1,8 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.IO;
+using System.Linq;
+using System.Reflection;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -101,6 +102,46 @@ namespace GdUnit3.Core
             {
                 Console.Error.WriteLine($"Can't parse namespace of {classPath}. Error: {e.Message}");
                 Godot.GD.PrintS("Build Error", $"Can't parse namespace of {classPath}. Error: {e.Message}");
+#pragma warning restore CS0168
+                // ignore exception
+                return null;
+            }
+        }
+
+        public static Godot.Node? ParseTestSuite(string classPath)
+        {
+            if (String.IsNullOrEmpty(classPath) || !new FileInfo(classPath).Exists)
+            {
+                Console.Error.WriteLine($"Parse Error: Class `{classPath}` not exists .");
+                Godot.GD.PrintS("Parse Error:", $"Class `{classPath}` not exists .");
+                return null;
+            }
+            try
+            {
+                Type? type = GdUnitTestSuiteBuilder.ParseType(classPath);
+                if (type == null)
+                    return null;
+                var testSuite = new CsNode(type.Name, classPath);
+
+                SyntaxTree syntaxTree = CSharpSyntaxTree.ParseText(File.ReadAllText(classPath));
+                ClassDeclarationSyntax programClassSyntax = GdUnitTestSuiteBuilder.ClassDeclaration(syntaxTree.GetCompilationUnitRoot());
+                var compilationUnit = syntaxTree.WithFilePath(classPath).GetCompilationUnitRoot();
+
+
+                type.GetMethods()
+                    .Where(mi => mi.IsDefined(typeof(TestCaseAttribute)))
+                    .Select(mi =>
+                    {
+                        var lineNumber = GdUnitTestSuiteBuilder.TestCaseLineNumber(compilationUnit, mi.Name);
+                        return new GdUnit3.Executions.TestCase(mi, lineNumber);
+                    })
+                    .ToList()
+                    .ForEach(testCase => testSuite.AddChild(new CsNode(testCase.Name, classPath, testCase.Line)));
+                return testSuite;
+            }
+#pragma warning disable CS0168
+            catch (Exception e)
+            {
 #pragma warning restore CS0168
                 // ignore exception
                 return null;

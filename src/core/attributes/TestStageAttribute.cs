@@ -15,13 +15,13 @@ namespace GdUnit3
         public long Timeout { get; set; } = -1;
 
         /// <summary>
+        /// The test name
+        /// </summary>
+        public string? Name { get; set; } = null;
+
+        /// <summary>
         /// The line of the annotated method
         /// </summary>
         internal int Line { get; set; }
-
-        /// <summary>
-        /// The name of the annotated method
-        /// </summary>
-        internal string Name { get; set; } = "";
     }
 }
