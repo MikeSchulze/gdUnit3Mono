@@ -18,6 +18,13 @@ namespace GdUnit3.Core.Tests
         }
 
         [TestCase]
+        public void ParseFullqualifiedClassName()
+        {
+            AssertThat(GdUnitTestSuiteBuilder.ParseFullqualifiedClassName("src/asserts/DictionaryAssert.cs"))
+                .IsEqual(new GdUnitTestSuiteBuilder.ClassDefinition("GdUnit3.Asserts", "DictionaryAssert"));
+        }
+
+        [TestCase]
         public void ParseType()
         {
             AssertObject(GdUnitTestSuiteBuilder.ParseType("test/core/resources/testsuites/mono/noSpace/TestSuiteWithoutNamespace.cs")).IsEqual(typeof(TestSuiteWithoutNamespace));
@@ -198,11 +205,20 @@ namespace GdUnit3.Example.Test.Resources
 
 
         [TestCase]
-        public void ParseTestSuite()
+        public void LoadTestSuite()
         {
-            var testSuite = GdUnitTestSuiteBuilder.ParseTestSuite("test/core/resources/testsuites/mono/spaceA/TestSuite.cs");
+            var testSuite = AutoFree(GdUnitTestSuiteBuilder.Load("test/core/ExampleTestSuite.cs"));
             AssertThat(testSuite).IsNotNull();
+            AssertThat(testSuite!.Name).IsEqual("ExampleTestSuite");
+            AssertThat(testSuite!.GetChildren())
+                .ExtractV(Extr("Name"), Extr("LineNumber"), Extr("TestCases"))
+                .ContainsExactly(
+                    Tuple("TestFoo", 38, new List<string>()),
+                    Tuple("TestBar", 44, new List<string>()),
+                    Tuple("Waiting", 50, new List<string>()),
+                    Tuple("TestFooBar", 56, new List<string>()),
+                    Tuple("TestCaseArguments", 64, new List<string> { "TestCaseArguments [1, 2, 3, 6]", "TestCaseArguments [3, 4, 5, 11]", "TestCaseArguments [6, 7, 8, 21]" }),
+                    Tuple("TestCasesWithCustomTestName", 72, new List<string> { "TestCaseA", "TestCaseB", "TestCaseC" }));
         }
-
     }
 }

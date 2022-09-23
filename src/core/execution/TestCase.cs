@@ -19,7 +19,9 @@ namespace GdUnit3.Executions
         public int Line
         { get; private set; }
 
-        public TestCaseAttribute Attributes => MethodInfo.GetCustomAttribute<TestCaseAttribute>();
+        public IEnumerable<TestCaseAttribute> TestCaseAttributes => MethodInfo.GetCustomAttributes<TestCaseAttribute>();
+
+        public TestCaseAttribute TestCaseAttribute => MethodInfo.GetCustomAttribute<TestCaseAttribute>();
 
         public bool IsSkipped => Attribute.IsDefined(MethodInfo, typeof(IgnoreUntilAttribute));
 

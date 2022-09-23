@@ -29,9 +29,9 @@ namespace GdUnit3.Tests
             _executor.AddTestEventListener(this);
         }
 
-        private static TestSuite LoadTestSuite(Type clazz)
+        private static TestSuite LoadTestSuite(string clazzPath)
         {
-            TestSuite testSuite = new TestSuite(clazz);
+            TestSuite testSuite = new TestSuite(clazzPath);
 
             // we disable default test filtering
             testSuite.FilterDisabled = true;
@@ -115,7 +115,7 @@ namespace GdUnit3.Tests
         [TestCase(Description = "Verifies the complete test suite ends with success and no failures are reported.")]
         public async Task Execute_Success()
         {
-            TestSuite testSuite = LoadTestSuite(typeof(TestSuiteAllStagesSuccess));
+            TestSuite testSuite = LoadTestSuite("test/core/resources/testsuites/mono/TestSuiteAllStagesSuccess.cs");
             AssertArray(testSuite.TestCases).Extract("Name").ContainsExactly(new string[] { "TestCase1", "TestCase2" });
 
             var events = await ExecuteTestSuite(testSuite);
@@ -153,7 +153,7 @@ namespace GdUnit3.Tests
         [TestCase(Description = "Verifies report a failure on stage 'Before'.")]
         public async Task Execute_FailureOnStage_Before()
         {
-            TestSuite testSuite = LoadTestSuite(typeof(TestSuiteFailOnStageBefore));
+            TestSuite testSuite = LoadTestSuite("test/core/resources/testsuites/mono/TestSuiteFailOnStageBefore.cs");
             AssertArray(testSuite.TestCases).Extract("Name").ContainsExactly(new string[] { "TestCase1", "TestCase2" });
 
             var events = await ExecuteTestSuite(testSuite);
@@ -194,7 +194,7 @@ namespace GdUnit3.Tests
         [TestCase(Description = "Verifies report a failure on stage 'After'.")]
         public async Task Execute_FailureOnStage_After()
         {
-            TestSuite testSuite = LoadTestSuite(typeof(TestSuiteFailOnStageAfter));
+            TestSuite testSuite = LoadTestSuite("test/core/resources/testsuites/mono/TestSuiteFailOnStageAfter.cs");
             AssertArray(testSuite.TestCases).Extract("Name").ContainsExactly(new string[] { "TestCase1", "TestCase2" });
 
             var events = await ExecuteTestSuite(testSuite);
@@ -235,7 +235,7 @@ namespace GdUnit3.Tests
         [TestCase(Description = "Verifies report a failure on stage 'BeforeTest'.")]
         public async Task Execute_FailureOnStage_BeforeTest()
         {
-            TestSuite testSuite = LoadTestSuite(typeof(TestSuiteFailOnStageBeforeTest));
+            TestSuite testSuite = LoadTestSuite("test/core/resources/testsuites/mono/TestSuiteFailOnStageBeforeTest.cs");
             AssertArray(testSuite.TestCases).Extract("Name").ContainsExactly(new string[] { "TestCase1", "TestCase2" });
 
             var events = await ExecuteTestSuite(testSuite);
@@ -275,7 +275,7 @@ namespace GdUnit3.Tests
         [TestCase(Description = "Verifies report a failure on stage 'AfterTest'.")]
         public async Task Execute_FailureOnStage_AfterTest()
         {
-            TestSuite testSuite = LoadTestSuite(typeof(TestSuiteFailOnStageAfterTest));
+            TestSuite testSuite = LoadTestSuite("test/core/resources/testsuites/mono/TestSuiteFailOnStageAfterTest.cs");
             AssertArray(testSuite.TestCases).Extract("Name").ContainsExactly(new string[] { "TestCase1", "TestCase2" });
 
             var events = await ExecuteTestSuite(testSuite);
@@ -315,7 +315,7 @@ namespace GdUnit3.Tests
         [TestCase(Description = "Verifies a failure is reportes for a single test case.")]
         public async Task Execute_FailureOn_TestCase1()
         {
-            TestSuite testSuite = LoadTestSuite(typeof(TestSuiteFailOnTestCase1));
+            TestSuite testSuite = LoadTestSuite("test/core/resources/testsuites/mono/TestSuiteFailOnTestCase1.cs");
             AssertArray(testSuite.TestCases).Extract("Name").ContainsExactly(new string[] { "TestCase1", "TestCase2" });
 
             var events = await ExecuteTestSuite(testSuite);
@@ -354,7 +354,7 @@ namespace GdUnit3.Tests
         [TestCase(Description = "Verifies multiple failures are reportes for different stages.")]
         public async Task Execute_FailureOn_MultiStages()
         {
-            TestSuite testSuite = LoadTestSuite(typeof(TestSuiteFailOnMultiStages));
+            TestSuite testSuite = LoadTestSuite("test/core/resources/testsuites/mono/TestSuiteFailOnMultiStages.cs");
             AssertArray(testSuite.TestCases).Extract("Name").ContainsExactly(new string[] { "TestCase1", "TestCase2" });
 
             var events = await ExecuteTestSuite(testSuite);
@@ -398,7 +398,7 @@ namespace GdUnit3.Tests
         [TestCase(Description = "GD-63: Execution must detect orphan nodes in the different test stages.")]
         public async Task Execute_Failure_OrphanNodesDetected()
         {
-            TestSuite testSuite = LoadTestSuite(typeof(TestSuiteFailAndOrpahnsDetected));
+            TestSuite testSuite = LoadTestSuite("test/core/resources/testsuites/mono/TestSuiteFailAndOrpahnsDetected.cs");
             AssertArray(testSuite.TestCases).Extract("Name").ContainsExactly(new string[] { "TestCase1", "TestCase2" });
 
             var events = await ExecuteTestSuite(testSuite);
@@ -438,12 +438,12 @@ namespace GdUnit3.Tests
                 // ends with warnings
                 Tuple(TESTCASE_AFTER, "TestCase1", new List<TestReport>() {
                 new TestReport(WARN, 0, "WARNING: Detected <2> orphan nodes during test setup stage! Check SetupTest:28 and TearDownTest:36 for unfreed instances!"),
-                new TestReport(WARN, 42, "WARNING: Detected <3> orphan nodes during test execution!")}),
+                new TestReport(WARN, 43, "WARNING: Detected <3> orphan nodes during test execution!")}),
                 Tuple(TESTCASE_BEFORE, "TestCase2", new List<TestReport>()),
                 // ends with failure and warnings 
                 Tuple(TESTCASE_AFTER, "TestCase2", new List<TestReport>() {
                 new TestReport(WARN, 0, "WARNING: Detected <2> orphan nodes during test setup stage! Check SetupTest:28 and TearDownTest:36 for unfreed instances!"),
-                new TestReport(WARN, 51, "WARNING: Detected <4> orphan nodes during test execution!"),
+                new TestReport(WARN, 52, "WARNING: Detected <4> orphan nodes during test execution!"),
                 new TestReport(FAILURE, 58, "Expecting be empty: but is  'TestCase2'") }),
                 // and one orphan detected at stage 'After'
                 Tuple(TESTSUITE_AFTER, "After", new List<TestReport>() { new TestReport(WARN, 0, "WARNING: Detected <1> orphan nodes during test suite setup stage! Check SetupSuite:15 and TearDownSuite:22 for unfreed instances!") }));
@@ -452,7 +452,7 @@ namespace GdUnit3.Tests
         [TestCase(Description = "GD-62: Execution must ignore detect orphan nodes if is disabled.")]
         public async Task Execute_Failure_OrphanNodesDetection_Disabled()
         {
-            TestSuite testSuite = LoadTestSuite(typeof(TestSuiteFailAndOrpahnsDetected));
+            TestSuite testSuite = LoadTestSuite("test/core/resources/testsuites/mono/TestSuiteFailAndOrpahnsDetected.cs");
             AssertArray(testSuite.TestCases).Extract("Name").ContainsExactly(new string[] { "TestCase1", "TestCase2" });
 
             // simulate test suite execution with disabled orphan detection
@@ -494,7 +494,7 @@ namespace GdUnit3.Tests
         [TestCase(Description = "GD-66: The execution must be aborted by a test timeout.")]
         public async Task Execute_Abort_OnTimeOut()
         {
-            TestSuite testSuite = LoadTestSuite(typeof(TestSuiteAbortOnTestTimeout));
+            TestSuite testSuite = LoadTestSuite("test/core/resources/testsuites/mono/TestSuiteAbortOnTestTimeout.cs");
             AssertArray(testSuite.TestCases).Extract("Name").ContainsExactly(new string[] { "TestCase1", "TestCase2", "TestCase3", "TestCase4", "TestCase5" });
 
             var events = await ExecuteTestSuite(testSuite);
@@ -561,7 +561,7 @@ namespace GdUnit3.Tests
                 // reports a test interruption due to a timeout
                 Tuple(TESTCASE_BEFORE, "TestCase1", new List<TestReport>()),
                 Tuple(TESTCASE_AFTER, "TestCase1", new List<TestReport>(){
-                new TestReport(INTERUPTED, 32, "The execution has timed out after 1000ms.") }),
+                new TestReport(INTERUPTED, 33, "The execution has timed out after 1000ms.") }),
 
                 // reports a test failure
                 Tuple(TESTCASE_BEFORE, "TestCase2", new List<TestReport>()),
@@ -575,7 +575,7 @@ namespace GdUnit3.Tests
                 // reports a method signature failure
                 Tuple(TESTCASE_BEFORE, "TestCase4", new List<TestReport>()),
                 Tuple(TESTCASE_AFTER, "TestCase4", new List<TestReport>(){
-                new TestReport(FAILURE, 55, "Invalid method signature found at: TestCase4. You must return a <Task> for an asynchronously specified method.") }),
+                new TestReport(FAILURE, 58, "Invalid method signature found at: TestCase4. You must return a <Task> for an asynchronously specified method.") }),
 
                 // succedes with no reports
                 Tuple(TESTCASE_BEFORE, "TestCase5", new List<TestReport>()),

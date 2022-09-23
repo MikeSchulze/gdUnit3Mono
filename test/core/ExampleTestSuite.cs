@@ -13,25 +13,25 @@ namespace GdUnit3.Tests.Asserts
         [Before]
         public void Before()
         {
-            GD.PrintS("calling Before");
+            // GD.PrintS("calling Before");
         }
 
         [After]
         public void After()
         {
-            GD.PrintS("calling After");
+            //GD.PrintS("calling After");
         }
 
         [BeforeTest]
         public void BeforeTest()
         {
-            GD.PrintS("calling BeforeTest");
+            //GD.PrintS("calling BeforeTest");
         }
 
         [AfterTest]
         public void AfterTest()
         {
-            GD.PrintS("calling AfterTest");
+            // GD.PrintS("calling AfterTest");
         }
 
         [TestCase]
@@ -47,11 +47,10 @@ namespace GdUnit3.Tests.Asserts
         }
 
         [TestCase]
-        public async Task waiting()
+        public async Task Waiting()
         {
-            await DoWait(1000);
+            await DoWait(200);
         }
-
 
         [TestCase]
         public void TestFooBar()
@@ -59,12 +58,20 @@ namespace GdUnit3.Tests.Asserts
             AssertBool(true).IsEqual(true);
         }
 
-        [TestCase(1, 2, 3, Name="A")]
-        [TestCase(3, 4, 5, Name="B")]
-        [TestCase(6, 7, 8, Name="C")]
-        public void TestDataPoints()
+        [TestCase(1, 2, 3, 6)]
+        [TestCase(3, 4, 5, 11)]
+        [TestCase(6, 7, 8, 21)]
+        public void TestCaseArguments(int a, int b, int c, int expect)
         {
-            AssertBool(true).IsEqual(true);
+            AssertThat(a + b + c).IsEqual(expect);
+        }
+
+        [TestCase(1, 2, 3, 6, TestName = "TestCaseA")]
+        [TestCase(3, 4, 5, 12, TestName = "TestCaseB")]
+        [TestCase(6, 7, 8, 21, TestName = "TestCaseC")]
+        public void TestCasesWithCustomTestName(int a, double b, int c, int expect)
+        {
+            AssertThat(a + b + c).IsEqual(expect);
         }
     }
 }

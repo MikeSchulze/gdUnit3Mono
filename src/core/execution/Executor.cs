@@ -36,11 +36,19 @@ namespace GdUnit3.Executions
 
         public bool ReportOrphanNodesEnabled { get; set; } = true;
 
+        /// <summary>
+        /// Execute a testsuite, is called externally from Godot test suite runner
+        /// </summary>
+        /// <param name="testSuite"></param>
         public async void Execute(CsNode testSuite)
         {
             try
             {
-                var includedTests = testSuite.GetChildren().Cast<Godot.Node>().ToList().Select(node => node.Name).ToList();
+                var includedTests = testSuite.GetChildren()
+                    .Cast<CsNode>()
+                    .ToList()
+                    .Select(node => node.Name)
+                    .ToList();
                 await ExecuteInternally(new TestSuite(testSuite.ResourcePath(), includedTests));
             }
             catch (Exception e)

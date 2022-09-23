@@ -4,6 +4,13 @@ namespace GdUnit3
 {
     public class TestStageAttribute : Attribute
     {
+
+        protected TestStageAttribute(string name, int line)
+        {
+            Name = name;
+            Line = line;
+        }
+
         /// <summary>
         /// Describes the intention of the test, will be shown as a tool tip on the inspector node.
         /// </summary>
@@ -17,11 +24,11 @@ namespace GdUnit3
         /// <summary>
         /// The test name
         /// </summary>
-        public string? Name { get; set; } = null;
+        internal string Name { get; private set; } = "";
 
         /// <summary>
         /// The line of the annotated method
         /// </summary>
-        internal int Line { get; set; }
+        internal int Line { get; private set; } = -1;
     }
 }
