@@ -59,7 +59,7 @@ namespace GdUnit3.Tests.Asserts
         }
 
         [TestCase(1, 2, 3, 6)]
-        [TestCase(3, 4, 5, 11)]
+        [TestCase(3, 4, 5, 12)]
         [TestCase(6, 7, 8, 21)]
         public void TestCaseArguments(int a, int b, int c, int expect)
         {

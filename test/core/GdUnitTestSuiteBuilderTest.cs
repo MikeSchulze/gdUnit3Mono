@@ -217,7 +217,7 @@ namespace GdUnit3.Example.Test.Resources
                     Tuple("TestBar", 44, new List<string>()),
                     Tuple("Waiting", 50, new List<string>()),
                     Tuple("TestFooBar", 56, new List<string>()),
-                    Tuple("TestCaseArguments", 64, new List<string> { "TestCaseArguments [1, 2, 3, 6]", "TestCaseArguments [3, 4, 5, 11]", "TestCaseArguments [6, 7, 8, 21]" }),
+                    Tuple("TestCaseArguments", 64, new List<string> { "TestCaseArguments [1, 2, 3, 6]", "TestCaseArguments [3, 4, 5, 12]", "TestCaseArguments [6, 7, 8, 21]" }),
                     Tuple("TestCasesWithCustomTestName", 72, new List<string> { "TestCaseA", "TestCaseB", "TestCaseC" }));
         }
     }

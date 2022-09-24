@@ -7,8 +7,9 @@ namespace GdUnit3.Executions
 {
     public sealed class Executor : Godot.Reference, IExecutor
     {
+        [Godot.Signal]
+        public delegate void ExecutionCompleted();
 
-        [Godot.Signal] private delegate void ExecutionCompleted();
         private List<ITestEventListener> _eventListeners = new List<ITestEventListener>();
 
         private class GdTestEventListenerDelegator : ITestEventListener
@@ -71,7 +72,7 @@ namespace GdUnit3.Executions
                 using (ExecutionContext context = new ExecutionContext(testSuite, _eventListeners, ReportOrphanNodesEnabled))
                 {
                     var task = new TestSuiteExecutionStage(testSuite).Execute(context);
-                    task.GetAwaiter().OnCompleted(() => EmitSignal("ExecutionCompleted"));
+                    task.GetAwaiter().OnCompleted(() => EmitSignal(nameof(ExecutionCompleted)));
                     await task;
                 }
             }
