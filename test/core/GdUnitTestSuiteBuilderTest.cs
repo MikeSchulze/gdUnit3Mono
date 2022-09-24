@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using System.Text;
 using System.Collections.Generic;
@@ -20,6 +21,12 @@ namespace GdUnit3.Core.Tests
         [TestCase]
         public void ParseFullqualifiedClassName()
         {
+            var currentDir = Directory.GetCurrentDirectory();
+            Console.WriteLine($"currentDir {currentDir}");
+            var path = currentDir + "/src/asserts/DictionaryAssert.cs";
+            var x = new FileInfo(path).Exists;
+            Console.WriteLine($"currentDir {path} exists {x}");
+
             AssertThat(GdUnitTestSuiteBuilder.ParseFullqualifiedClassName("src/asserts/DictionaryAssert.cs"))
                 .IsEqual(new GdUnitTestSuiteBuilder.ClassDefinition("GdUnit3.Asserts", "DictionaryAssert"));
         }
