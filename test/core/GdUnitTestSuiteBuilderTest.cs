@@ -18,27 +18,11 @@ namespace GdUnit3.Core.Tests
             ClearTempDir();
         }
 
-
-        private static void ScanTestSuites(DirectoryInfo currentDir)
-        {
-            Console.WriteLine($"Scanning for test suites in: {currentDir.FullName}");
-            foreach (var file in currentDir.GetFiles("*.cs"))
-            {
-                Console.WriteLine($"currentFile {file.FullName} {new FileInfo(file.FullName).Exists}");
-            }
-            foreach (var directory in currentDir.GetDirectories())
-                ScanTestSuites(directory);
-        }
-
         [TestCase]
         public void ParseFullqualifiedClassName()
         {
-            var currentDir = Directory.GetCurrentDirectory();
-            Console.WriteLine($"currentDir {currentDir}");
-            ScanTestSuites(new DirectoryInfo(currentDir));
-
-            AssertThat(GdUnitTestSuiteBuilder.ParseFullqualifiedClassName("src/asserts/DictionaryAssert.cs"))
-                .IsEqual(new GdUnitTestSuiteBuilder.ClassDefinition("GdUnit3.Asserts", "DictionaryAssert"));
+            AssertThat(GdUnitTestSuiteBuilder.ParseFullqualifiedClassName("test/core/resources/ssources/TestPerson.cs"))
+                .IsEqual(new GdUnitTestSuiteBuilder.ClassDefinition("GdUnit3.Example.Test.Resources", "TestPerson"));
         }
 
         [TestCase]
