@@ -21,7 +21,7 @@ namespace GdUnit3.Core.Tests
         [TestCase]
         public void ParseFullqualifiedClassName()
         {
-            AssertThat(GdUnitTestSuiteBuilder.ParseFullqualifiedClassName("test/core/resources/ssources/TestPerson.cs"))
+            AssertThat(GdUnitTestSuiteBuilder.ParseFullqualifiedClassName("test/core/resources/sources/TestPerson.cs"))
                 .IsEqual(new GdUnitTestSuiteBuilder.ClassDefinition("GdUnit3.Example.Test.Resources", "TestPerson"));
         }
 
