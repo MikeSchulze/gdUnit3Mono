@@ -15,7 +15,7 @@
     <RepositoryUrl>https://github.com/MikeSchulze/gdUnit3Mono</RepositoryUrl>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <!-- Exclude tests -->
-    <DefaultItemExcludes>$(DefaultItemExcludes);test/**/*</DefaultItemExcludes>
+    <!-- <DefaultItemExcludes>$(DefaultItemExcludes);test/**/*</DefaultItemExcludes> -->
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
