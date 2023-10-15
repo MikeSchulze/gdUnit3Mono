@@ -53,7 +53,7 @@ namespace GdUnit3.Tests
             }
         }
 
-        private Vector2 ActualMousePos() => SceneRunner.Scene().GetViewport().GetMousePosition();
+        private Vector2 ActualMousePos() => SceneRunner.GetMousePosition();
 
 
         [TestCase]
