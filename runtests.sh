@@ -6,6 +6,7 @@ if [ -z "$GODOT_BIN" ]; then
     exit 1
 fi
 
-$GODOT_BIN --no-window -d res://TestRunner.tscn --verbose $*
+$GODOT_BIN -s -d ./addons/gdUnit3/bin/GdUnitCmdTool.gd $*
 exit_code=$?
+$GODOT_BIN --no-window --quiet -s -d ./addons/gdUnit3/bin/GdUnitCopyLog.gd $* > /dev/null
 exit $exit_code

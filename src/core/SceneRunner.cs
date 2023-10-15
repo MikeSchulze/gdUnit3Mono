@@ -100,6 +100,8 @@ namespace GdUnit3.Core
 {
     using Godot;
     using Executions;
+    using System.Collections.Generic;
+
     internal sealed class SceneRunner : GdUnit3.ISceneRunner
     {
         private SceneTree SceneTree { get; set; }
@@ -109,6 +111,10 @@ namespace GdUnit3.Core
         private Vector2 CurrentMousePos { get; set; }
         private double TimeFactor { get; set; }
         private int SavedIterationsPerSecond { get; set; }
+
+        private InputEvent? LastInputEvent { get; set; }
+        private ICollection<KeyList> KeyOnPress = new HashSet<KeyList>();
+        private ICollection<ButtonList> MouseButtonOnPress = new HashSet<ButtonList>();
 
         public SceneRunner(string resourcePath, bool autoFree = false, bool verbose = false)
         {
@@ -123,93 +129,224 @@ namespace GdUnit3.Core
             SetTimeFactor(1.0);
         }
 
-        public GdUnit3.ISceneRunner SetMousePos(Vector2 position)
+        private void ResetInputToDefault()
         {
-            CurrentScene.GetViewport().WarpMouse(position);
-            CurrentMousePos = position;
+            // reset all mouse button to inital state if need
+            foreach (ButtonList button in MouseButtonOnPress.ToList())
+            {
+                if (Input.IsMouseButtonPressed((int)button))
+                    SimulateMouseButtonRelease(button);
+            }
+            MouseButtonOnPress.Clear();
+
+            foreach (KeyList key in KeyOnPress.ToList())
+            {
+                if (Input.IsKeyPressed((int)key))
+                    SimulateKeyRelease(key);
+            }
+            KeyOnPress.Clear();
+            Input.FlushBufferedEvents();
+        }
+
+
+        /// <summary>
+        /// copy over current active modifiers
+        /// </summary>
+        /// <param name="inputEvent"></param>
+        private void ApplyInputModifiers(InputEventWithModifiers inputEvent)
+        {
+            if (LastInputEvent is InputEventWithModifiers lastInputEvent)
+            {
+                inputEvent.Meta = inputEvent.Meta || lastInputEvent.Meta;
+                inputEvent.Alt = inputEvent.Alt || lastInputEvent.Alt;
+                inputEvent.Shift = inputEvent.Shift || lastInputEvent.Shift;
+                inputEvent.Control = inputEvent.Control || lastInputEvent.Control;
+            }
+        }
+
+        /// <summary>
+        /// copy over current active mouse mask and combine with curren mask
+        /// </summary>
+        /// <param name="inputEvent"></param>
+        private void ApplyInputMouseMask(InputEvent inputEvent)
+        {
+            // first apply last mask
+            if (LastInputEvent is InputEventMouse lastInputEvent && inputEvent is InputEventMouse ie)
+                ie.ButtonMask |= lastInputEvent.ButtonMask;
+            if (inputEvent is InputEventMouseButton inputEventMouseButton)
+            {
+                ButtonList button = (ButtonList)Enum.ToObject(typeof(ButtonList), inputEventMouseButton.ButtonIndex);
+                int mask = toMouseButtonMask(button);
+                if (inputEventMouseButton.IsPressed())
+                    inputEventMouseButton.ButtonMask |= mask;
+                else
+                    inputEventMouseButton.ButtonMask ^= mask;
+            }
+        }
+
+        internal static int toMouseButtonMask(ButtonList button)
+        {
+            int button_mask = 1 << ((int)button - 1);
+            return button_mask;
+        }
+
+
+        /// <summary>
+        /// copy over last mouse position if need
+        /// </summary>
+        /// <param name="inputEvent"></param>
+        private void ApplyInputMousePosition(InputEvent inputEvent)
+        {
+            if (LastInputEvent is InputEventMouse lastInputEvent && inputEvent is InputEventMouseButton ie)
+                ie.Position = lastInputEvent.Position;
+        }
+
+        /// <summary>
+        /// for handling read https://docs.godotengine.org/en/stable/tutorials/inputs/inputevent.html?highlight=inputevent#how-does-it-work
+        /// </summary>
+        /// <param name="inputEvent"></param>
+        /// <returns></returns>
+        private ISceneRunner HandleInputEvent(InputEvent inputEvent)
+        {
+            if (inputEvent is InputEventMouse ie)
+                Input.WarpMousePosition(ie.Position);
+            Input.ParseInputEvent(inputEvent);
+            Input.FlushBufferedEvents();
+
+            if (Godot.Object.IsInstanceValid(CurrentScene))
+            {
+                Print($"	process event {CurrentScene} ({SceneName()}) <- {inputEvent.AsText()}");
+                if (CurrentScene.HasMethod("_gui_input"))
+                    CurrentScene.Call("_gui_input", inputEvent);
+                if (CurrentScene.HasMethod("_unhandled_input"))
+                    CurrentScene.Call("_unhandled_input", inputEvent);
+                CurrentScene.GetViewport().SetInputAsHandled();
+            }
+            // save last input event needs to be merged with next InputEventMouseButton
+            LastInputEvent = inputEvent;
             return this;
         }
 
-        public GdUnit3.ISceneRunner SimulateKeyPress(KeyList key_code, bool shift = false, bool control = false)
+        public ISceneRunner SimulateKeyPress(KeyList keyCode, bool shiftPressed = false, bool controlPressed = false)
         {
             PrintCurrentFocus();
-            var action = new InputEventKey();
-            action.Pressed = true;
-            action.Scancode = ((uint)key_code);
-            action.Shift = shift;
-            action.Control = control;
-
-            Print("	process key event {0} ({1}) <- {2}:{3}", CurrentScene, SceneName(), action.AsText(), action.IsPressed() ? "pressing" : "released");
-            SceneTree.InputEvent(action);
-            return this;
+            var inputEvent = new InputEventKey();
+            inputEvent.Pressed = true;
+            inputEvent.Scancode = ((uint)keyCode);
+            inputEvent.PhysicalScancode = ((uint)keyCode);
+            inputEvent.Alt = keyCode == KeyList.Alt;
+            inputEvent.Shift = shiftPressed || keyCode == KeyList.Shift;
+            inputEvent.Control = controlPressed || keyCode == KeyList.Control;
+            ApplyInputModifiers(inputEvent);
+            KeyOnPress.Add(keyCode);
+            return HandleInputEvent(inputEvent);
         }
 
-        public GdUnit3.ISceneRunner SimulateKeyPressed(KeyList key_code, bool shift = false, bool control = false)
+        public ISceneRunner SimulateKeyPressed(KeyList keyCode, bool shift = false, bool control = false)
         {
-            SimulateKeyPress(key_code, shift, control);
-            SimulateKeyRelease(key_code, shift, control);
+            SimulateKeyPress(keyCode, shift, control);
+            SimulateKeyRelease(keyCode, shift, control);
             return this;
         }
 
-        public GdUnit3.ISceneRunner SimulateKeyRelease(KeyList key_code, bool shift = false, bool control = false)
+        public ISceneRunner SimulateKeyRelease(KeyList keyCode, bool shiftPressed = false, bool controlPressed = false)
         {
             PrintCurrentFocus();
-            var action = new InputEventKey();
-            action.Pressed = false;
-            action.Scancode = ((uint)key_code);
-            action.Shift = shift;
-            action.Control = control;
-
-            Print("	process key event {0} ({1}) <- {2}:{3}", CurrentScene, SceneName(), action.AsText(), action.IsPressed() ? "pressing" : "released");
-            SceneTree.InputEvent(action);
-            return this;
+            var inputEvent = new InputEventKey();
+            inputEvent.Pressed = false;
+            inputEvent.Scancode = ((uint)keyCode);
+            inputEvent.PhysicalScancode = ((uint)keyCode);
+            inputEvent.Alt = keyCode == KeyList.Alt;
+            inputEvent.Shift = shiftPressed || keyCode == KeyList.Shift;
+            inputEvent.Control = controlPressed || keyCode == KeyList.Control;
+            ApplyInputModifiers(inputEvent);
+            KeyOnPress.Remove(keyCode);
+            return HandleInputEvent(inputEvent);
         }
 
-        public GdUnit3.ISceneRunner SimulateMouseMove(Vector2 relative, Vector2 speed = default)
+        public ISceneRunner SimulateMouseButtonPressed(ButtonList buttonIndex, bool doubleClick = false)
         {
-            var action = new InputEventMouseMotion();
-            action.Relative = relative;
-            action.Speed = speed == default ? Vector2.One : speed;
-
-            Print("	process mouse motion event {0} ({1}) <- {2}", CurrentScene, SceneName(), action.AsText());
-            SceneTree.InputEvent(action);
-            return this;
-        }
-
-        public GdUnit3.ISceneRunner SimulateMouseButtonPressed(ButtonList buttonIndex)
-        {
-            SimulateMouseButtonPress(buttonIndex);
+            SimulateMouseButtonPress(buttonIndex, doubleClick);
             SimulateMouseButtonRelease(buttonIndex);
             return this;
         }
 
-        public GdUnit3.ISceneRunner SimulateMouseButtonPress(ButtonList buttonIndex)
+        public ISceneRunner SimulateMouseButtonPress(ButtonList buttonIndex, bool doubleClick = false)
         {
             PrintCurrentFocus();
-            var action = new InputEventMouseButton();
-            action.ButtonIndex = (int)buttonIndex;
-            action.ButtonMask = (int)buttonIndex;
-            action.Pressed = true;
-            action.Position = CurrentMousePos;
-            action.GlobalPosition = CurrentMousePos;
+            var inputEvent = new InputEventMouseButton();
+            inputEvent.ButtonIndex = (int)buttonIndex;
+            inputEvent.Pressed = true;
+            inputEvent.Doubleclick = doubleClick;
 
-            Print("	process mouse button event {0} ({1}) <- {2}", CurrentScene, SceneName(), action.AsText());
-            SceneTree.InputEvent(action);
-            return this;
+            MouseButtonOnPress.Add(buttonIndex);
+            ApplyInputMousePosition(inputEvent);
+            ApplyInputMouseMask(inputEvent);
+            ApplyInputModifiers(inputEvent);
+            return HandleInputEvent(inputEvent);
         }
 
-        public GdUnit3.ISceneRunner SimulateMouseButtonRelease(ButtonList buttonIndex)
+        public ISceneRunner SimulateMouseButtonRelease(ButtonList buttonIndex)
         {
-            var action = new InputEventMouseButton();
-            action.ButtonIndex = (int)buttonIndex;
-            action.ButtonMask = 0;
-            action.Pressed = false;
-            action.Position = CurrentMousePos;
-            action.GlobalPosition = CurrentMousePos;
+            var inputEvent = new InputEventMouseButton();
+            inputEvent.ButtonIndex = (int)buttonIndex;
+            inputEvent.Pressed = false;
 
-            Print("	process mouse button event {0} ({1}) <- {2}", CurrentScene, SceneName(), action.AsText());
-            SceneTree.InputEvent(action);
-            return this;
+            MouseButtonOnPress.Remove(buttonIndex);
+            ApplyInputMousePosition(inputEvent);
+            ApplyInputMouseMask(inputEvent);
+            ApplyInputModifiers(inputEvent);
+            return HandleInputEvent(inputEvent);
+        }
+
+        public ISceneRunner SetMousePos(Vector2 position)
+        {
+            var inputEvent = new InputEventMouseMotion();
+            inputEvent.Position = position;
+            inputEvent.GlobalPosition = GetGlobalMousePosition();
+            ApplyInputModifiers(inputEvent);
+            return HandleInputEvent(inputEvent);
+        }
+
+        public Vector2 GetMousePosition()
+        {
+            if (LastInputEvent is InputEventMouse me)
+                return me.Position;
+            return CurrentScene.GetViewport().GetMousePosition();
+        }
+
+        public Vector2 GetGlobalMousePosition() =>
+            SceneTree.Root.GetMousePosition();
+
+        public ISceneRunner SimulateMouseMove(Vector2 position)
+        {
+            var inputEvent = new InputEventMouseMotion();
+            inputEvent.Position = position;
+            inputEvent.Relative = position - GetMousePosition();
+            ApplyInputMouseMask(inputEvent);
+            ApplyInputModifiers(inputEvent);
+            return HandleInputEvent(inputEvent);
+        }
+
+        public async Task SimulateMouseMoveRelative(Vector2 relative, Vector2 speed = default)
+        {
+            if (LastInputEvent is InputEventMouse lastInputEvent)
+            {
+                var current_pos = lastInputEvent.Position;
+                var final_pos = current_pos + relative;
+                double delta_milli = speed.x * 0.1;
+                var t = 0.0;
+
+                while (!current_pos.IsEqualApprox(final_pos))
+                {
+                    t += delta_milli * speed.x;
+                    SimulateMouseMove(current_pos);
+                    await AwaitMillis((uint)(delta_milli * 1000));
+                    current_pos = current_pos.LinearInterpolate(final_pos, (float)t);
+                }
+                SimulateMouseMove(final_pos);
+                await SimulateFrames(10);
+            }
         }
 
         public GdUnit3.ISceneRunner SetTimeFactor(double timeFactor = 1.0)
@@ -232,7 +369,7 @@ namespace GdUnit3.Core
         {
             var timeShiftFrames = Math.Max(1, frames / TimeFactor);
             for (int frame = 0; frame < timeShiftFrames; frame++)
-                await AwaitIdleFrame();
+                await SceneTree.ToSignal(SceneTree, "idle_frame");
         }
 
         private void ActivateTimeFactor()
@@ -282,7 +419,8 @@ namespace GdUnit3.Core
         public GdUnitAwaiter.GodotMethodAwaiter<V> AwaitMethod<V>(string methodName) =>
             new GdUnitAwaiter.GodotMethodAwaiter<V>(CurrentScene, methodName);
 
-        public async Task AwaitIdleFrame() => await Task.Run(() => SceneTree.ToSignal(SceneTree, "idle_frame"));
+        public async Task AwaitIdleFrame() =>
+            await SceneTree.ToSignal(SceneTree, "idle_frame");
 
         public async Task AwaitMillis(uint timeMillis)
         {
@@ -317,21 +455,34 @@ namespace GdUnit3.Core
         public void MoveWindowToForeground()
         {
             OS.WindowMaximized = true;
+            OS.WindowMinimized = false;
             OS.CenterWindow();
             OS.MoveWindowToForeground();
         }
 
+        internal bool disposed = false;
         public void Dispose()
         {
+            if (disposed)
+            {
+                return;
+            }
             DeactivateTimeFactor();
+            ResetInputToDefault();
             OS.WindowMaximized = false;
             OS.WindowMinimized = true;
             SceneTree.Root.RemoveChild(CurrentScene);
-            if (SceneAutoFree)
-                CurrentScene.Free();
+            if (CurrentScene != null)
+            {
+                //SceneTree.Root.RemoveChild(CurrentScene);
+                if (SceneAutoFree)
+                    CurrentScene.Free();
+            }
+            disposed = true;
             // we hide the scene/main window after runner is finished 
             OS.WindowMaximized = false;
             OS.WindowMinimized = true;
         }
+
     }
 }
