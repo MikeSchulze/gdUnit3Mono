@@ -7,10 +7,10 @@
     <RootNamespace>GdUnit3</RootNamespace>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <PackageVersion>2.3.1-release.$([System.DateTime]::Now.ToString('yyyyMMddHHmm'))</PackageVersion>
+    <PackageVersion>2.3.2-release.$([System.DateTime]::Now.ToString('yyyyMMddHHmm'))</PackageVersion>
     <Title>GdUnit3Mono</Title>
     <Authors>MikeSchulze</Authors>
-    <Version>2.3.1.1</Version>
+    <Version>2.3.2.0</Version>
     <Description>The Godot C# extension for GdUnit3.</Description>
     <RepositoryUrl>https://github.com/MikeSchulze/gdUnit3Mono</RepositoryUrl>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
@@ -20,7 +20,7 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.2.0" />
-    <!-- PackageReference Include="GodotSharp" Version="3.2.3" -->
+    <!-- <PackageReference Include="GodotSharp" Version="3.2.3" /> -->
     <!-- Content Include=".gitignore" -->
     <Content Include="LICENSE" />
     <None Include="LICENSE" Pack="true" PackagePath="" />
