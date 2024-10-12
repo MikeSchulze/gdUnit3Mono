@@ -18,6 +18,13 @@
   <img alt="GitHub branch checks state" src="https://img.shields.io/github/checks-status/MikeSchulze/gdunit3/master"></br>
 </p>
 
+> __Note__
+```diff
+- GdUnit3 is Now in out of Maintenance!
+```
+>  Meaning that NO new features will be added and NO bug fixes will be made.<br> 
+>  The development of GdUnit continues with <a href="[https://github.com/MikeSchulze/gdUnit4](https://github.com/MikeSchulze/gdUnit4Net)">GdUnit4Net</a>, which is designed for use with Godot4.
+
 
 
 ## What is GdUnit3Mono
